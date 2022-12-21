@@ -233,11 +233,7 @@ class PropertyValueMapper(Config, Counters):
         self._pv_map = OrderedDict({'GLOBAL': {}})
         self._num_pv_map_keys = 0
         self._max_words_in_keys = 0
-        #TODO Remove
-        print(f"PVMAP Files {pv_map_files}")
         for filename in pv_map_files:
-            #TODO Remove
-            print(f"PVMAP File {filename}")
             namespace = 'GLOBAL'
             if ':' in filename:
                 namespace, filename = filename.split(':', 1)
@@ -572,11 +568,7 @@ class StatVarsMap(Config, Counters):
     }
 
     def __init__(self, config_dict: dict = None, counters_dict: dict = None):
-        #TODO Remove
-        print("config init from StatVarsMap")
         Config.__init__(self, config_dict=config_dict)
-        #TODO Remove
-        print("Counters init from StatVarsMap")
         Counters.__init__(self,
                           counters_dict=counters_dict,
                           debug=self.get_config('debug', False))
@@ -1389,8 +1381,6 @@ class StatVarDataProcessor(Config, Counters):
                 config_dict=config_dict,
                 counters_dict=self.get_counters())
         else:
-            #TODO Remove
-            print("PV Mapper")
             self._pv_mapper = pv_mapper
         self._statvars_map = StatVarsMap(config_dict=config_dict,
                                          counters_dict=self.get_counters())
@@ -2137,40 +2127,25 @@ def process(data_processor_class: StatVarDataProcessor,
     '''Process all input_data files to extract StatVars and StatvarObs.
     Emit the StatVars and StataVarObs into output mcf and csv files.
     '''
-    #TODO remove 
-    print(f"Config file is {config_file}")
     config = get_config_from_file(config_file)
     config_dict = config.get_configs()
     if input_data:
         config_dict['input_data'] = input_data
-    #TODO remove
-    print(f"Config Dict : {config_dict}")
-    print("Prepare Input")
     input_data = prepare_input_data(config_dict)
     output_dir = os.path.dirname(output_path)
     if output_dir:
         logging.info(f'Creating output directory: {output_dir}')
         os.makedirs(output_dir, exist_ok=True)
-    #TODO remove
-    print(f"parallelism : {parallelism}")
     if parallelism <= 1:
         logging.info(f'Processing data {input_data} into {output_path}...')
-        #TODO remove
-        print(f"Map file {pv_map_files} ")
         if pv_map_files:
             config_dict['pv_map'] = pv_map_files
         if counters is None:
             counters = {}
-        #TODO remove
-        print(f"data_processor_class :{data_processor_class} ")
         if not data_processor_class:
             data_processor_class = StatVarDataProcessor
-        #TODO remove
-        print(f"config_dict :{config_dict} , counters_dict = {counters}")
         data_processor = data_processor_class(config_dict=config_dict,
                                               counters_dict=counters)
-        #TODO remove
-        print(f"Process data files")
         data_processor.process_data_files(input_data)
         data_processor.write_outputs(output_path)
         # Check if there were any errors.

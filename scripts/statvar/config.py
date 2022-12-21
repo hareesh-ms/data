@@ -191,13 +191,10 @@ class Config:
 
     def __init__(self, config_dict: dict = None, filename: str = None):
         self._config_dict = dict(_DEFAULT_CONFIG)
-        #TODO Remove
-        print(f"Init file={filename}")
         self.add_configs(self.get_config_from_flags())
         if config_dict:
             self.add_configs(config_dict)
         if filename:
-            print(f"Filename is {filename} - loading peoperties")
             self.load_config_file(filename)
         logging.set_verbosity(self.get_config('log_level'))
         logging.debug(f'Using config: {self.get_configs()}')
@@ -237,8 +234,6 @@ class Config:
         Returns:
           The config dictionary.
           '''
-        #TODO Remove
-        print(f"File : {filename} ")
         self.add_configs(get_py_dict_from_file(filename))
         return self._config_dict
 
