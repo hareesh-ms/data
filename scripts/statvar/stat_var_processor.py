@@ -12,20 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 '''Class to generate StatVar and StatVarObs from data files.
-
 Create a file mapping data columns to a set of property-values.
 See test_data/sample_column_map.py.
-
 To process data files, run the following command:
   python3 stat_var_processor.py --input_data=<path-to-csv> \
       --pv_map=<column-pv-map-file> \
       --output_path=<output-prefix>
-
 This will generate the following outputs:
   <output-prefix>.mcf: MCF file with StatVar definitions.
   <output-prefix>.csv: CSV file with StatVarObservations.
   <output-prefix>.tmcf: MCF file mapping CSV columns to StatVar PVs.
-
 For more details on configs and usage, please refer to the README.
 '''
 
@@ -205,25 +201,20 @@ class PropertyValueMapper(Config, Counters):
       ...
     },
   }
-
   The first level keys in _pv_map are namespaces that are column-headers or 'GLOBAL'.
   When looking up PVs for an input string, such as a column header or a cell value,
   first the namespace column-header is tried.
   If there are no values then other namespacs such as 'GLOBAL are tried.
-
   <value> within the PV can have a reference to another property.
   Such reference are replaced with that property's value after
   all PVs for a data cell have been collected.
-
   The references are indicated with the syntax '{Variable}' or '@Variable'.
   where 'Variable' is expected to be another property in the cell's PVs.
-
   Internal properties that require special processing begin with '#', such as:
   '#Regex': refers to a regular expression with names match groups
       to be applied on a cell value
   '#Format': a format string to be processed with other parameters
   '#Eval': a python statement to be evaluated. It could have some computations.
-
   The cell value is mapped to the following default properties:
   'Data': the string value in the cell
   'Number': the numeric value if the cell is a number.
@@ -233,6 +224,7 @@ class PropertyValueMapper(Config, Counters):
                  pv_map_files: list = [],
                  config_dict: dict = None,
                  counters_dict: dict = None):
+
         Config.__init__(self, config_dict=config_dict)
         Counters.__init__(self,
                           counters_dict=counters_dict,
@@ -241,7 +233,11 @@ class PropertyValueMapper(Config, Counters):
         self._pv_map = OrderedDict({'GLOBAL': {}})
         self._num_pv_map_keys = 0
         self._max_words_in_keys = 0
+        #TODO Remove
+        print(f"PVMAP Files {pv_map_files}")
         for filename in pv_map_files:
+            #TODO Remove
+            print(f"PVMAP File {filename}")
             namespace = 'GLOBAL'
             if ':' in filename:
                 namespace, filename = filename.split(':', 1)
@@ -534,10 +530,8 @@ class StatVarsMap(Config, Counters):
     _statvar_obs_map:
        dictionary with the fingerprint of place+date+variable as key
        mapped to dictionary of property:values for StatVarObs.
-
     Both maps may include additional internal properties such as '#Error...',
     '#input' that are used for validation and debugging.
-
     Processing options are passed in through a config object.
     The following configurations are used in this class:
       - schemaless: bool: to indicate support for schemaless statvars.
@@ -568,7 +562,6 @@ class StatVarsMap(Config, Counters):
           If any such commented properties exist in a StatVar,
           it is converted to a schemaless statvar, i.e,
           its measuredProperty is set to its dcid.
-
     StatVars and StatVarObs are validated for duplicate values
     with conflicting dcids before being emited to output files.
     '''
@@ -579,7 +572,11 @@ class StatVarsMap(Config, Counters):
     }
 
     def __init__(self, config_dict: dict = None, counters_dict: dict = None):
+        #TODO Remove
+        print("config init from StatVarsMap")
         Config.__init__(self, config_dict=config_dict)
+        #TODO Remove
+        print("Counters init from StatVarsMap")
         Counters.__init__(self,
                           counters_dict=counters_dict,
                           debug=self.get_config('debug', False))
@@ -787,7 +784,6 @@ class StatVarsMap(Config, Counters):
         Returns:
           list of properties removed.
           the pv_map_dict is also updated in place.
-
         Batches property and values to be looked up in the DC API.
         '''
         # Collect all property and values to be checked in schema.
@@ -1393,6 +1389,8 @@ class StatVarDataProcessor(Config, Counters):
                 config_dict=config_dict,
                 counters_dict=self.get_counters())
         else:
+            #TODO Remove
+            print("PV Mapper")
             self._pv_mapper = pv_mapper
         self._statvars_map = StatVarsMap(config_dict=config_dict,
                                          counters_dict=self.get_counters())
@@ -2139,26 +2137,40 @@ def process(data_processor_class: StatVarDataProcessor,
     '''Process all input_data files to extract StatVars and StatvarObs.
     Emit the StatVars and StataVarObs into output mcf and csv files.
     '''
+    #TODO remove 
+    print(f"Config file is {config_file}")
     config = get_config_from_file(config_file)
     config_dict = config.get_configs()
     if input_data:
         config_dict['input_data'] = input_data
+    #TODO remove
+    print(f"Config Dict : {config_dict}")
+    print("Prepare Input")
     input_data = prepare_input_data(config_dict)
     output_dir = os.path.dirname(output_path)
     if output_dir:
         logging.info(f'Creating output directory: {output_dir}')
         os.makedirs(output_dir, exist_ok=True)
+    #TODO remove
+    print(f"parallelism : {parallelism}")
     if parallelism <= 1:
         logging.info(f'Processing data {input_data} into {output_path}...')
+        #TODO remove
+        print(f"Map file {pv_map_files} ")
         if pv_map_files:
             config_dict['pv_map'] = pv_map_files
         if counters is None:
             counters = {}
+        #TODO remove
+        print(f"data_processor_class :{data_processor_class} ")
         if not data_processor_class:
             data_processor_class = StatVarDataProcessor
-
+        #TODO remove
+        print(f"config_dict :{config_dict} , counters_dict = {counters}")
         data_processor = data_processor_class(config_dict=config_dict,
                                               counters_dict=counters)
+        #TODO remove
+        print(f"Process data files")
         data_processor.process_data_files(input_data)
         data_processor.write_outputs(output_path)
         # Check if there were any errors.

@@ -30,6 +30,8 @@ class Counters():
           debug: Enable or disable debug context counters.
           config_dict: Dictionary with config parameter:values.
         '''
+        #TODO Remove
+        print("Set Counters")
         self._counters = counters_dict
         self._debug = debug
         if counters_dict is None:

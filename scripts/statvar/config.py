@@ -11,16 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''Class to store configuration parameters as a dictionary.'''
 
-import ast
 import sys
+import ast
 
 from absl import app
 from absl import flags
 from absl import logging
 from collections import OrderedDict
 from typing import Union
+
 
 _FLAGS = flags.FLAGS
 
@@ -175,7 +175,7 @@ def get_py_dict_from_file(filename: str) -> dict:
     Returns:
       dictionary loaded from the file.
     '''
-    logging.info(f'Loading python dict from {filename}...')
+    logging.info(f'Loading python dict from file {filename}...')
     with open(filename) as file:
         pv_map_str = file.read()
 
@@ -191,10 +191,13 @@ class Config:
 
     def __init__(self, config_dict: dict = None, filename: str = None):
         self._config_dict = dict(_DEFAULT_CONFIG)
+        #TODO Remove
+        print(f"Init file={filename}")
         self.add_configs(self.get_config_from_flags())
         if config_dict:
             self.add_configs(config_dict)
         if filename:
+            print(f"Filename is {filename} - loading peoperties")
             self.load_config_file(filename)
         logging.set_verbosity(self.get_config('log_level'))
         logging.debug(f'Using config: {self.get_configs()}')
@@ -234,6 +237,8 @@ class Config:
         Returns:
           The config dictionary.
           '''
+        #TODO Remove
+        print(f"File : {filename} ")
         self.add_configs(get_py_dict_from_file(filename))
         return self._config_dict
 
